@@ -17,7 +17,7 @@ var cs = builder.Configuration.GetConnectionString("Default");
 if (string.IsNullOrWhiteSpace(cs))
 {
     throw new InvalidOperationException(
-        "Missing ConnectionStrings:Default. Set it in User Secrets or environment variables.");
+        "Missing ConnectionStrings:Default. Set it in User Secrets.");
 }
 
 // for using DI 
