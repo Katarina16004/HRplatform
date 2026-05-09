@@ -55,5 +55,46 @@ namespace HRplatform.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet]
+        public async Task<IActionResult> GetAllWithSkills()
+        {
+            try
+            {
+                var candidates = await _service.GetAllCandidatesWithSkillsAsync();
+                return Ok(candidates);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetByIdWithSkills(string id)
+        {
+            try
+            {
+                var candidate = await _service.GetCandidateWithSkillsByIdAsync(id);
+                return Ok(candidate);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("byName/{name}")]
+        public async Task<IActionResult> GetByNameWithSkills(string name)
+        {
+            try
+            {
+                var candidates = await _service.GetCandidatesWithSkillsByNameAsync(name);
+                return Ok(candidates);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

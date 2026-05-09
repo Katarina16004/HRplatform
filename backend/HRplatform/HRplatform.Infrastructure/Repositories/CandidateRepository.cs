@@ -1,4 +1,5 @@
 ﻿using HRplatform.Application.Interfaces;
+using HRplatform.Domain;
 using HRplatform.Infrastructure.Db;
 using MySqlConnector;
 
@@ -97,6 +98,133 @@ namespace HRplatform.Infrastructure.Repositories
                     int rows = await cmd.ExecuteNonQueryAsync();
                     return rows > 0;
                 }
+            }
+        }
+
+        private async Task<List<Skill>> GetSkillsForCandidateAsync(MySqlConnection conn, string candidateId)
+        {
+            string sql = "SELECT s.id, s.name FROM candidate_skills cs INNER JOIN skill s ON s.id = cs.skill_id WHERE cs.candidate_id = @candidate_id;";
+
+            List<Skill> skills = new List<Skill>();
+
+            using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+            {
+                cmd.Parameters.AddWithValue("@candidate_id", candidateId);
+                using (MySqlDataReader reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        Skill s = new Skill();
+                        s.Id = reader["id"].ToString();
+                        s.Name = reader.GetString("name");
+                        skills.Add(s);
+                    }
+                }
+            }
+
+            return skills;
+        }
+        public async Task<List<Candidate>> GetAllCandidatesWithSkillsAsync()
+        {
+            string sql = "SELECT id, full_name, date_of_birth, email, contact_num FROM Candidate;";
+            List<Candidate> candidates = new List<Candidate>();
+
+            using (MySqlConnection conn = _factory.Create())
+            {
+                await conn.OpenAsync();
+
+                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                {
+                    using (MySqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            Candidate c = new Candidate();
+                            c.Id = reader["id"].ToString();
+                            c.FullName = reader.GetString("full_name");
+                            c.DateOfBirth = DateOnly.FromDateTime(reader.GetDateTime("date_of_birth"));
+                            c.Email = reader.GetString("email");
+                            c.ContactNum = reader.GetString("contact_num");
+                            candidates.Add(c);
+                        }
+                    }
+                }
+
+                foreach (Candidate c in candidates)
+                {
+                    c.Skills = await GetSkillsForCandidateAsync(conn, c.Id);
+                }
+            }
+
+            return candidates;
+        }
+
+        public async Task<Candidate?> GetCandidateWithSkillsByIdAsync(string id)
+        {
+            string sql = "SELECT * FROM Candidate WHERE id = @id;";
+
+            using (MySqlConnection conn = _factory.Create())
+            {
+                await conn.OpenAsync();
+                Candidate? c = null;
+
+                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", id);
+                    using (MySqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            c = new Candidate();
+                            c.Id = reader["id"].ToString();
+                            c.FullName = reader.GetString("full_name");
+                            c.DateOfBirth = DateOnly.FromDateTime(reader.GetDateTime("date_of_birth"));
+                            c.Email = reader.GetString("email");
+                            c.ContactNum = reader.GetString("contact_num");
+                        }
+                    }
+                }
+
+                if (c == null)
+                    return null;
+
+                c.Skills = await GetSkillsForCandidateAsync(conn, c.Id);
+                return c;
+            }
+        }
+
+        public async Task<List<Candidate>> GetCandidatesWithSkillsByNameAsync(string name)
+        {
+            string sql = "SELECT * FROM Candidate WHERE full_name = @name;";
+            List<Candidate> candidates = new List<Candidate>(); 
+            using (MySqlConnection conn = _factory.Create())
+            {
+                await conn.OpenAsync();
+                Candidate? c = null;
+
+                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@name", name);
+                    using (MySqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            c = new Candidate();
+                            c.Id = reader["id"].ToString();
+                            c.FullName = reader.GetString("full_name");
+                            c.DateOfBirth = DateOnly.FromDateTime(reader.GetDateTime("date_of_birth"));
+                            c.Email = reader.GetString("email");
+                            c.ContactNum = reader.GetString("contact_num");
+                            candidates.Add(c);
+                        }
+                    }
+                }
+
+                foreach (Candidate cand in candidates)
+                {
+                    cand.Skills = await GetSkillsForCandidateAsync(conn, cand.Id);
+                }
+                return candidates;
             }
         }
     }

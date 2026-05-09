@@ -67,8 +67,8 @@ namespace HRplatform.Application.Services
                 throw new Exception("Candidate ID is required.");
             if (string.IsNullOrWhiteSpace(skillId))
                 throw new Exception("Skill ID is required.");
-            
-            if(await _repo.CandidateHasSkillAsync(candidateId, skillId))
+
+            if (await _repo.CandidateHasSkillAsync(candidateId, skillId))
                 throw new Exception("Candidate already has this skill.");
             return await _repo.AddSkillToCandidateAsync(candidateId, skillId);
         }
@@ -79,9 +79,32 @@ namespace HRplatform.Application.Services
             if (string.IsNullOrWhiteSpace(skillId))
                 throw new Exception("Skill ID is required.");
 
-            if(!await _repo.CandidateHasSkillAsync(candidateId, skillId))
+            if (!await _repo.CandidateHasSkillAsync(candidateId, skillId))
                 throw new Exception("Candidate does not have this skill.");
             return await _repo.RemoveSkillFromCandidateAsync(candidateId, skillId);
+        }
+        public async Task<List<Candidate>> GetAllCandidatesWithSkillsAsync()
+        {
+            return await _repo.GetAllCandidatesWithSkillsAsync();
+        }
+        public async Task<Candidate> GetCandidateWithSkillsByIdAsync(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                throw new Exception("Id is required.");
+
+            Candidate? c = await _repo.GetCandidateWithSkillsByIdAsync(id);
+            if (c == null)
+                throw new Exception("Candidate not found.");
+            return c;
+        }
+        public async Task<List<Candidate>> GetCandidatesWithSkillsByNameAsync(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new Exception("Name is required.");
+            List<Candidate> candidates = await _repo.GetCandidatesWithSkillsByNameAsync(name);
+            if (candidates == null || candidates.Count == 0)
+                throw new Exception("Candidate not found.");
+            return candidates;
         }
     }
 }

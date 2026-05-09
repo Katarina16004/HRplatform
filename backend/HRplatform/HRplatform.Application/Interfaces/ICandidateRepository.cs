@@ -9,5 +9,8 @@ namespace HRplatform.Application.Interfaces
         Task<bool> AddSkillToCandidateAsync(string candidateId, string skillId);
         Task<bool> RemoveSkillFromCandidateAsync(string candidateId, string skillId);
         Task<bool> CandidateHasSkillAsync(string candidateId, string skillId);
+        Task<List<Candidate>> GetAllCandidatesWithSkillsAsync();
+        Task<Candidate?> GetCandidateWithSkillsByIdAsync(string id);
+        Task<List<Candidate>> GetCandidatesWithSkillsByNameAsync(string name);
     }
 }
