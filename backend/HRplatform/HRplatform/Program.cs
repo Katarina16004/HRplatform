@@ -1,4 +1,7 @@
+using HRplatform.Application.Interfaces;
+using HRplatform.Application.Services;
 using HRplatform.Infrastructure.Db;
+using HRplatform.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,8 +19,13 @@ if (string.IsNullOrWhiteSpace(cs))
     throw new InvalidOperationException(
         "Missing ConnectionStrings:Default. Set it in User Secrets or environment variables.");
 }
+
 // for using DI 
+// once for app lifetime
 builder.Services.AddSingleton(new MySqlConnectionFactory(cs));
+// once for request
+builder.Services.AddScoped<ISkillRepository, SkillRepository>(); 
+builder.Services.AddScoped<SkillService>();
 
 var app = builder.Build();
 
