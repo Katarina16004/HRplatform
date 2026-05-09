@@ -26,6 +26,8 @@ builder.Services.AddSingleton(new MySqlConnectionFactory(cs));
 // once for request
 builder.Services.AddScoped<ISkillRepository, SkillRepository>(); 
 builder.Services.AddScoped<SkillService>();
+builder.Services.AddScoped<ICandidateRepository, CandidateRepository>();    
+builder.Services.AddScoped<CandidateService>();
 
 var app = builder.Build();
 
