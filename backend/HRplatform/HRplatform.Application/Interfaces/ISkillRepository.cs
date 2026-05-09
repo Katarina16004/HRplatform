@@ -6,5 +6,7 @@ namespace HRplatform.Application.Interfaces
     {
         Task<bool> SkillExistsByNameAsync(string name);
         Task<string> CreateSkillAsync(Skill skill);
+        Task<List<Skill>> GetAllSkillsAsync();
+        Task<Skill?> GetSkillByIdAsync(string id);
     }
 }

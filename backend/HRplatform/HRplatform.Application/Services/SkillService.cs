@@ -15,7 +15,7 @@ namespace HRplatform.Application.Services
 
         public async Task<string> AddSkillAsync(CreateSkillRequest req)
         {
-            string name="";
+            string name = "";
             if (req.Name == null)
                 throw new Exception("Request is required.");
             else
@@ -33,6 +33,20 @@ namespace HRplatform.Application.Services
             };
 
             return await _repo.CreateSkillAsync(skill);
+        }
+        public async Task<List<Skill>> GetAllSkillsAsync()
+        {
+            return await _repo.GetAllSkillsAsync();
+        }
+        public async Task<Skill?> GetSkillByIdAsync(string id)
+        {
+            if(string.IsNullOrWhiteSpace(id))
+                throw new Exception("Id is required.");
+            Skill? skill = await _repo.GetSkillByIdAsync(id);
+            if (skill == null)
+                throw new Exception("Skill not found.");
+
+            return skill;
         }
     }
 }

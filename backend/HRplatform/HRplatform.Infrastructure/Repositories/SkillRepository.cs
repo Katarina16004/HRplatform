@@ -1,4 +1,5 @@
 ﻿using HRplatform.Application.Interfaces;
+using HRplatform.Domain;
 using HRplatform.Infrastructure.Db;
 using MySqlConnector;
 
@@ -28,6 +29,7 @@ namespace HRplatform.Infrastructure.Repositories
                 }
             }
         }
+
         public async Task<bool> SkillExistsByNameAsync(string name)
         {
             string sql = "SELECT 1 FROM Skill WHERE LOWER(name) = @name;";
@@ -42,7 +44,55 @@ namespace HRplatform.Infrastructure.Repositories
                     return result != null;
                 }
             }
+        }
 
+        public async Task<List<Skill>> GetAllSkillsAsync()
+        {
+            string sql = "SELECT * FROM Skill;";
+            List<Skill> skills = new List<Skill>();
+            using (MySqlConnection conn = _factory.Create())
+            {
+                await conn.OpenAsync();
+                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                {
+                    using (MySqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            Skill s = new Skill();
+                            s.Id = reader["id"].ToString();
+                            s.Name = reader.GetString("name");
+                            skills.Add(s);
+                        }
+                    }
+                }
+
+                return skills;
+            }
+        }
+
+        public async Task<Skill?> GetSkillByIdAsync(string id)
+        {
+            string sql = "SELECT * FROM Skill WHERE id = @id;";
+            using (MySqlConnection conn = _factory.Create())
+            {
+                await conn.OpenAsync();
+                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", id);
+                    using (MySqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            Skill s = new Skill();
+                            s.Id = reader["id"].ToString();
+                            s.Name = reader.GetString("name");
+                            return s;
+                        }
+                    }
+                }
+            }
+            return null;
         }
     }
 }
