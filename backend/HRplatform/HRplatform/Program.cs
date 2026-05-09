@@ -1,3 +1,5 @@
+using HRplatform.Infrastructure.Db;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -6,6 +8,16 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// added DB connection string from configuration (appsettings.json and User Secrets)
+var cs = builder.Configuration.GetConnectionString("Default");
+if (string.IsNullOrWhiteSpace(cs))
+{
+    throw new InvalidOperationException(
+        "Missing ConnectionStrings:Default. Set it in User Secrets or environment variables.");
+}
+// for using DI 
+builder.Services.AddSingleton(new MySqlConnectionFactory(cs));
 
 var app = builder.Build();
 
