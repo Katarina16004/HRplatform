@@ -129,11 +129,7 @@ namespace HRplatform.Infrastructure.Repositories
                 {
                     cmd.Parameters.AddWithValue("@id", id);
                     int rows = await cmd.ExecuteNonQueryAsync();
-                    if (rows > 0)
-                    {
-                        return true;
-                    }
-                    return false;
+                    return rows > 0;
                 }
             }
         }

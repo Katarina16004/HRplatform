@@ -28,5 +28,32 @@ namespace HRplatform.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPost("{candidateId}/skills/{skillId}")]
+        public async Task<IActionResult> AddSkill(string candidateId, string skillId)
+        {
+            try
+            {
+                await _service.AddSkillToCandidateAsync(candidateId, skillId);
+                return Ok("Skill added.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("{candidateId}/skills/{skillId}")]
+        public async Task<IActionResult> RemoveSkill(string candidateId, string skillId)
+        {
+            try
+            {
+                await _service.DeleteSkillFromCandidateAsync(candidateId, skillId);
+                return Ok("Skill deleted.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

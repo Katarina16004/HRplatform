@@ -47,5 +47,57 @@ namespace HRplatform.Infrastructure.Repositories
                 }
             }
         }
+
+        public async Task<bool> CandidateHasSkillAsync(string candidateId, string skillId)
+        {
+            string sql = "SELECT 1 FROM candidate_skills WHERE candidate_id = @candidate_id AND skill_id = @skill_id;";
+            using (MySqlConnection conn = _factory.Create())
+            {
+                await conn.OpenAsync();
+                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@candidate_id", candidateId);
+                    cmd.Parameters.AddWithValue("@skill_id", skillId);
+                    object? result = await cmd.ExecuteScalarAsync();
+                    return result != null;
+                }
+            }
+        }
+
+        public async Task<bool> AddSkillToCandidateAsync(string candidateId, string skillId)
+        {
+            string sql = "INSERT INTO candidate_skills (candidate_id, skill_id) VALUES (@candidate_id, @skill_id);";
+            using (MySqlConnection conn = _factory.Create())
+            {
+                await conn.OpenAsync();
+                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@candidate_id", candidateId);
+                    cmd.Parameters.AddWithValue("@skill_id", skillId);
+
+                    int rows = await cmd.ExecuteNonQueryAsync();
+                    return rows > 0;
+                }
+            }
+        }
+
+        public async Task<bool> RemoveSkillFromCandidateAsync(string candidateId, string skillId)
+        {
+            string sql = "DELETE FROM candidate_skills WHERE candidate_id = @candidate_id AND skill_id = @skill_id;";
+
+            using (MySqlConnection conn = _factory.Create())
+            {
+                await conn.OpenAsync();
+
+                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@candidate_id", candidateId);
+                    cmd.Parameters.AddWithValue("@skill_id", skillId);
+
+                    int rows = await cmd.ExecuteNonQueryAsync();
+                    return rows > 0;
+                }
+            }
+        }
     }
 }

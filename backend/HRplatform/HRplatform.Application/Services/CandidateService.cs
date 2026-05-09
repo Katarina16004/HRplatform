@@ -18,11 +18,11 @@ namespace HRplatform.Application.Services
             if (req == null)
                 throw new Exception("Request is required.");
 
-            string fullName="";
-            string email="";
-            string number="";
+            string fullName = "";
+            string email = "";
+            string number = "";
             DateOnly? dateOfBirth = null;
-           
+
             try
             {
                 fullName = (req.FullName).Trim();
@@ -37,13 +37,13 @@ namespace HRplatform.Application.Services
 
             List<string> errors = new List<string>();
 
-            if (string.IsNullOrWhiteSpace(fullName)) 
+            if (string.IsNullOrWhiteSpace(fullName))
                 errors.Add("Full name is required.");
-            if (string.IsNullOrWhiteSpace(email)) 
+            if (string.IsNullOrWhiteSpace(email))
                 errors.Add("Email is required.");
-            if (string.IsNullOrWhiteSpace(number)) 
+            if (string.IsNullOrWhiteSpace(number))
                 errors.Add("Contact number is required.");
-            if (req.DateOfBirth == null) 
+            if (req.DateOfBirth == null)
                 errors.Add("Date of birth is required.");
 
             if (errors.Count > 0)
@@ -60,6 +60,28 @@ namespace HRplatform.Application.Services
             candidate.ContactNum = number;
 
             return await _repo.CreateCandidateAsync(candidate);
+        }
+        public async Task<bool> AddSkillToCandidateAsync(string candidateId, string skillId)
+        {
+            if (string.IsNullOrWhiteSpace(candidateId))
+                throw new Exception("Candidate ID is required.");
+            if (string.IsNullOrWhiteSpace(skillId))
+                throw new Exception("Skill ID is required.");
+            
+            if(await _repo.CandidateHasSkillAsync(candidateId, skillId))
+                throw new Exception("Candidate already has this skill.");
+            return await _repo.AddSkillToCandidateAsync(candidateId, skillId);
+        }
+        public async Task<bool> DeleteSkillFromCandidateAsync(string candidateId, string skillId)
+        {
+            if (string.IsNullOrWhiteSpace(candidateId))
+                throw new Exception("Candidate ID is required.");
+            if (string.IsNullOrWhiteSpace(skillId))
+                throw new Exception("Skill ID is required.");
+
+            if(!await _repo.CandidateHasSkillAsync(candidateId, skillId))
+                throw new Exception("Candidate does not have this skill.");
+            return await _repo.RemoveSkillFromCandidateAsync(candidateId, skillId);
         }
     }
 }
