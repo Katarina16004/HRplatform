@@ -54,5 +54,34 @@ namespace HRplatform.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("byName/{name}")]
+        public async Task<IActionResult> GetByName(string name)
+        {
+            try
+            {
+                var skill = await _service.GetSkillByNameAsync(name);
+                return Ok(skill);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            try
+            {
+                bool deleted = await _service.DeleteSkillAsync(id);
+                if (deleted)
+                    return Ok(new { message = "Skill deleted successfully." });
+                else
+                    return NotFound(new { message = "Skill not found." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

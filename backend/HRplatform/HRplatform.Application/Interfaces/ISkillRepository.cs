@@ -8,5 +8,7 @@ namespace HRplatform.Application.Interfaces
         Task<string> CreateSkillAsync(Skill skill);
         Task<List<Skill>> GetAllSkillsAsync();
         Task<Skill?> GetSkillByIdAsync(string id);
+        Task<Skill?> GetSkillByNameAsync(string name);
+        Task<bool> DeleteSkillAsync(string id);
     }
 }

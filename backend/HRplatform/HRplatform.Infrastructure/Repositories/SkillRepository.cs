@@ -32,7 +32,7 @@ namespace HRplatform.Infrastructure.Repositories
 
         public async Task<bool> SkillExistsByNameAsync(string name)
         {
-            string sql = "SELECT 1 FROM Skill WHERE LOWER(name) = @name;";
+            string sql = "SELECT 1 FROM Skill WHERE name = @name;";
             using (MySqlConnection conn = _factory.Create())
             {
                 await conn.OpenAsync();
@@ -93,6 +93,49 @@ namespace HRplatform.Infrastructure.Repositories
                 }
             }
             return null;
+        }
+
+        public async Task<Skill?> GetSkillByNameAsync(string name)
+        {
+            string sql = "SELECT * FROM Skill WHERE name = @name;";
+            using (MySqlConnection conn = _factory.Create())
+            {
+                await conn.OpenAsync();
+                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@name", name);
+                    using (MySqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            Skill s = new Skill();
+                            s.Id = reader["id"].ToString();
+                            s.Name = reader.GetString("name");
+                            return s;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        public async Task<bool> DeleteSkillAsync(string id)
+        {
+            string sql = "DELETE FROM Skill WHERE id = @id;";
+            using (MySqlConnection conn = _factory.Create())
+            {
+                await conn.OpenAsync();
+                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", id);
+                    int rows = await cmd.ExecuteNonQueryAsync();
+                    if (rows > 0)
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+            }
         }
     }
 }
