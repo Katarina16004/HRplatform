@@ -12,4 +12,10 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\HRplatform.Application\HRplatform.Application.csproj" />
+    <ProjectReference Include="..\HRplatform.Domain\HRplatform.Domain.csproj" />
+    <ProjectReference Include="..\HRplatform.Infrastructure\HRplatform.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
