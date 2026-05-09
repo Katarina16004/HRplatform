@@ -16,7 +16,7 @@ namespace HRplatform.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateCandidateRequest request)
+        public async Task<IActionResult> Create(CreateUpdateCandidateRequest request)
         {
             try
             {
@@ -90,6 +90,40 @@ namespace HRplatform.API.Controllers
             {
                 var candidates = await _service.GetCandidatesWithSkillsByNameAsync(name);
                 return Ok(candidates);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(string id, CreateUpdateCandidateRequest request)
+        {
+            try
+            {
+                bool updated = await _service.UpdateCandidateAsync(id, request);
+                if (!updated)
+                    return BadRequest("Candidate not found.");
+
+                return Ok("Candidate updated.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            try
+            {
+                bool deleted = await _service.DeleteCandidateAsync(id);
+                if (!deleted)
+                    return BadRequest("Candidate not found.");
+
+                return Ok("Candidate deleted.");
             }
             catch (Exception ex)
             {

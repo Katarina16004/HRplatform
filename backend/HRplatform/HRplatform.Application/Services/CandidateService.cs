@@ -1,6 +1,7 @@
 ﻿using HRplatform.Application.DTO;
 using HRplatform.Application.Interfaces;
 using HRplatform.Domain;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HRplatform.Application.Services
 {
@@ -13,7 +14,7 @@ namespace HRplatform.Application.Services
             _repo = repo;
         }
 
-        public async Task<string> AddCandidateAsync(CreateCandidateRequest req)
+        public async Task<string> AddCandidateAsync(CreateUpdateCandidateRequest req)
         {
             if (req == null)
                 throw new Exception("Request is required.");
@@ -106,5 +107,65 @@ namespace HRplatform.Application.Services
                 throw new Exception("Candidate not found.");
             return candidates;
         }
+        public async Task<bool> UpdateCandidateAsync(string id, CreateUpdateCandidateRequest req)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                throw new Exception("Id is required.");
+            if (req == null)
+                throw new Exception("Request is required.");
+
+            string fullName = "";
+            string email= "";
+            string number = "";
+
+            try {
+                fullName = (req.FullName).Trim();
+                email = (req.Email).Trim();
+                number = (req.ContactNum).Trim();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Invalid request data: " + ex.Message);
+            }
+
+            List<string> errors = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(fullName))
+                errors.Add("Full name is required.");
+            if (string.IsNullOrWhiteSpace(email))
+                errors.Add("Email is required.");
+            if (string.IsNullOrWhiteSpace(number))
+                errors.Add("Contact number is required.");
+            if (req.DateOfBirth == null)
+                errors.Add("Date of birth is required.");
+
+            if (errors.Count > 0)
+                throw new Exception(string.Join(" ", errors));
+
+            if(!await _repo.CandidateExistsByIdAsync(id))
+                throw new Exception("Candidate not found.");
+
+            if(await _repo.CandidateExistsByEmailExceptThisIdAsync(email, id))
+                throw new Exception("Candidate with this email already exists.");
+
+            Candidate c = new Candidate();
+            c.Id = id;
+            c.FullName = fullName;
+            c.DateOfBirth = req.DateOfBirth.Value;
+            c.Email = email;
+            c.ContactNum = number;
+
+            return await _repo.UpdateCandidateAsync(c);
+        }
+        public async Task<bool> DeleteCandidateAsync(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                throw new Exception("Id is required.");
+            if(!await _repo.CandidateExistsByIdAsync(id))
+                throw new Exception("Candidate not found.");
+
+            return await _repo.DeleteCandidateAsync(id);
+        }
+
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace HRplatform.Application.DTO
 {
-    public class CreateCandidateRequest
+    public class CreateUpdateCandidateRequest
     {
         public string FullName { get; set; } = "";
         public DateOnly? DateOfBirth { get; set; }

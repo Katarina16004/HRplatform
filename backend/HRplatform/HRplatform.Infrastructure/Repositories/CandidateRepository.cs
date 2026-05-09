@@ -48,6 +48,37 @@ namespace HRplatform.Infrastructure.Repositories
                 }
             }
         }
+        public async Task<bool> CandidateExistsByEmailExceptThisIdAsync(string email, string id)
+        {
+            string sql = "SELECT 1 FROM Candidate WHERE email = @email AND id != @id;";
+            using (MySqlConnection conn = _factory.Create())
+            {
+                await conn.OpenAsync();
+                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", id);
+                    cmd.Parameters.AddWithValue("@email", email);
+
+                    object? result = await cmd.ExecuteScalarAsync();
+                    return result != null;
+                }
+            }
+        }
+        public async Task<bool> CandidateExistsByIdAsync(string id)
+        {
+            string sql = "SELECT 1 FROM Candidate WHERE id = @id;";
+            using (MySqlConnection conn = _factory.Create())
+            {
+                await conn.OpenAsync();
+                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    object? result = await cmd.ExecuteScalarAsync();
+                    return result != null;
+                }
+            }
+        }
 
         public async Task<bool> CandidateHasSkillAsync(string candidateId, string skillId)
         {
@@ -225,6 +256,42 @@ namespace HRplatform.Infrastructure.Repositories
                     cand.Skills = await GetSkillsForCandidateAsync(conn, cand.Id);
                 }
                 return candidates;
+            }
+        }
+
+        public async Task<bool> DeleteCandidateAsync(string id)
+        {
+            string sql = "DELETE FROM Candidate WHERE id = @id;";
+            using (MySqlConnection conn = _factory.Create())
+            {
+                await conn.OpenAsync();
+                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    int rows = await cmd.ExecuteNonQueryAsync();
+                    return rows > 0;
+                }
+            }
+        }
+
+        public async Task<bool> UpdateCandidateAsync(Candidate candidate)
+        {
+            string sql = "UPDATE Candidate SET full_name = @full_name, date_of_birth = @date_of_birth, email = @email, contact_num = @contact_num WHERE id = @id;";
+            using (MySqlConnection conn = _factory.Create())
+            {
+                await conn.OpenAsync();
+                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", candidate.Id);
+                    cmd.Parameters.AddWithValue("@full_name", candidate.FullName);
+                    cmd.Parameters.AddWithValue("@date_of_birth", candidate.DateOfBirth);
+                    cmd.Parameters.AddWithValue("@email", candidate.Email);
+                    cmd.Parameters.AddWithValue("@contact_num", candidate.ContactNum);
+
+                    int rows = await cmd.ExecuteNonQueryAsync();
+                    return rows > 0;
+                }
             }
         }
     }
