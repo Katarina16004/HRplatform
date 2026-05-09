@@ -130,5 +130,34 @@ namespace HRplatform.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("search")]
+        public async Task<IActionResult> Search([FromQuery] string? name, [FromQuery] string? skillIds)
+        {
+            try
+            {
+                List<string> ids = new List<string>();
+
+                if (!string.IsNullOrWhiteSpace(skillIds))
+                {
+                    string[] parts = skillIds.Split(',');
+
+                    for (int i = 0; i < parts.Length; i++)
+                    {
+                        string part = parts[i].Trim();
+                        if (part.Length == 0)
+                            continue;
+
+                        ids.Add(part);
+                    }
+                }
+
+                var candidates = await _service.GetCandidatesBySkillsAndNameAsync(name, ids);
+                return Ok(candidates);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

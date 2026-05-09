@@ -294,5 +294,99 @@ namespace HRplatform.Infrastructure.Repositories
                 }
             }
         }
+
+        public async Task<List<Candidate>> GetCandidatesBySkillsAndNameAsync(string? name, List<string>? skillsId)
+        {
+            string nameValue="";
+            bool hasName = false;
+            bool hasSkills = false;
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                hasName = true;
+                nameValue = name.Trim();
+            }
+
+            List<string> ids = new List<string>();
+
+            if (skillsId != null)
+            {
+                foreach (var skillId in skillsId)
+                { 
+                    string? v = skillId;
+                    if (string.IsNullOrWhiteSpace(v))
+                        continue;
+                    ids.Add(v.Trim());
+                    hasSkills = true;
+                }
+            }
+
+            if (!hasName && !hasSkills)
+                return new List<Candidate>();
+
+            string sql = "SELECT c.id, c.full_name, c.date_of_birth, c.email, c.contact_num " + "FROM Candidate c ";
+
+            if (hasSkills)
+                sql += "INNER JOIN candidate_skills cs ON cs.candidate_id = c.id ";
+
+            sql += "WHERE 1=1 ";
+
+            if (hasName)
+                sql += "AND c.full_name LIKE @name ";
+
+            if (hasSkills)
+            {
+                string inList = "";
+                for (int i = 0; i < ids.Count; i++)
+                {
+                    if (i > 0)
+                        inList += ", ";
+
+                    inList += "@s" + i;
+                }
+                sql += $"AND cs.skill_id IN ({inList}) \n";
+                sql += "GROUP BY c.id \n";
+                sql += "HAVING COUNT(DISTINCT cs.skill_id) = @skillCount \n"; 
+            }
+
+            List<Candidate> candidates = new List<Candidate>();
+
+            using (MySqlConnection conn = _factory.Create())
+            {
+                await conn.OpenAsync();
+
+                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                {
+                    if (hasName)
+                        cmd.Parameters.AddWithValue("@name", nameValue);
+
+                    if (hasSkills)
+                    {
+                        for (int i = 0; i < ids.Count; i++)
+                            cmd.Parameters.AddWithValue("@s" + i, ids[i]);
+
+                        cmd.Parameters.AddWithValue("@skillCount", ids.Count);
+                    }
+
+                    using (MySqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            Candidate c = new Candidate();
+                            c.Id = reader["id"].ToString();
+                            c.FullName = reader.GetString("full_name");
+                            c.DateOfBirth = DateOnly.FromDateTime(reader.GetDateTime("date_of_birth"));
+                            c.Email = reader.GetString("email");
+                            c.ContactNum = reader.GetString("contact_num");
+                            candidates.Add(c);
+                        }
+                    }
+                }
+
+                foreach (Candidate c in candidates)
+                    c.Skills = await GetSkillsForCandidateAsync(conn, c.Id);
+            }
+
+            return candidates;
+        }
     }
 }

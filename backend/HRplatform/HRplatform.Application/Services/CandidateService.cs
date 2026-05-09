@@ -115,10 +115,11 @@ namespace HRplatform.Application.Services
                 throw new Exception("Request is required.");
 
             string fullName = "";
-            string email= "";
+            string email = "";
             string number = "";
 
-            try {
+            try
+            {
                 fullName = (req.FullName).Trim();
                 email = (req.Email).Trim();
                 number = (req.ContactNum).Trim();
@@ -142,10 +143,10 @@ namespace HRplatform.Application.Services
             if (errors.Count > 0)
                 throw new Exception(string.Join(" ", errors));
 
-            if(!await _repo.CandidateExistsByIdAsync(id))
+            if (!await _repo.CandidateExistsByIdAsync(id))
                 throw new Exception("Candidate not found.");
 
-            if(await _repo.CandidateExistsByEmailExceptThisIdAsync(email, id))
+            if (await _repo.CandidateExistsByEmailExceptThisIdAsync(email, id))
                 throw new Exception("Candidate with this email already exists.");
 
             Candidate c = new Candidate();
@@ -161,11 +162,20 @@ namespace HRplatform.Application.Services
         {
             if (string.IsNullOrWhiteSpace(id))
                 throw new Exception("Id is required.");
-            if(!await _repo.CandidateExistsByIdAsync(id))
+            if (!await _repo.CandidateExistsByIdAsync(id))
                 throw new Exception("Candidate not found.");
 
             return await _repo.DeleteCandidateAsync(id);
         }
 
+        public async Task<List<Candidate>> GetCandidatesBySkillsAndNameAsync(string? name, List<string>? skillsId)
+        {
+            if (string.IsNullOrWhiteSpace(name) && (skillsId == null || skillsId.Count == 0))
+                throw new Exception("At least name or skills are required.");
+            List<Candidate> candidates = await _repo.GetCandidatesBySkillsAndNameAsync(name, skillsId);
+            if (candidates == null || candidates.Count == 0)
+                throw new Exception("Candidate not found.");
+            return candidates;
+        }
     }
 }
