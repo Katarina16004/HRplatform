@@ -15,6 +15,7 @@ namespace HRplatform.API.Controllers
             _service = service;
         }
 
+        // creates candidate
         [HttpPost]
         public async Task<IActionResult> Create(CreateUpdateCandidateRequest request)
         {
@@ -28,6 +29,8 @@ namespace HRplatform.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        // adds skill to candidate by id
         [HttpPost("{candidateId}/skills/{skillId}")]
         public async Task<IActionResult> AddSkill(string candidateId, string skillId)
         {
@@ -42,6 +45,7 @@ namespace HRplatform.API.Controllers
             }
         }
 
+        // removes skill from candidate by id
         [HttpDelete("{candidateId}/skills/{skillId}")]
         public async Task<IActionResult> RemoveSkill(string candidateId, string skillId)
         {
@@ -55,6 +59,8 @@ namespace HRplatform.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        // gets all candidates with their skills
         [HttpGet]
         public async Task<IActionResult> GetAllWithSkills()
         {
@@ -69,6 +75,7 @@ namespace HRplatform.API.Controllers
             }
         }
 
+        // gets candidate with given id with skills
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdWithSkills(string id)
         {
@@ -83,6 +90,7 @@ namespace HRplatform.API.Controllers
             }
         }
 
+        // gets candidate with given name with skills
         [HttpGet("byName/{name}")]
         public async Task<IActionResult> GetByNameWithSkills(string name)
         {
@@ -97,6 +105,7 @@ namespace HRplatform.API.Controllers
             }
         }
 
+        // updates candidate 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(string id, CreateUpdateCandidateRequest request)
         {
@@ -114,6 +123,7 @@ namespace HRplatform.API.Controllers
             }
         }
 
+        // deletes candidate 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
@@ -130,8 +140,10 @@ namespace HRplatform.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        // searching candidates by name or/and skills (if has any of skills it will be returned)
         [HttpGet("search")]
-        public async Task<IActionResult> Search([FromQuery] string? name, [FromQuery] string? skillIds)
+        public async Task<IActionResult> Search(string? name, string? skillIds)
         {
             try
             {
@@ -141,13 +153,10 @@ namespace HRplatform.API.Controllers
                 {
                     string[] parts = skillIds.Split(',');
 
-                    for (int i = 0; i < parts.Length; i++)
+                    foreach (var part in parts)
                     {
-                        string part = parts[i].Trim();
-                        if (part.Length == 0)
-                            continue;
-
-                        ids.Add(part);
+                        if (!string.IsNullOrWhiteSpace(part))
+                            ids.Add(part.Trim());
                     }
                 }
 

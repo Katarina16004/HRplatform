@@ -6,11 +6,13 @@ namespace HRplatform.Infrastructure.Db
     {
         private readonly string _connectionString;
 
+        // connection from settings
         public MySqlConnectionFactory(string connectionString)
         {
             _connectionString = connectionString;
         }
 
+        // creating MySqlConn object for using connection
         public MySqlConnection Create() => new MySqlConnection(_connectionString);
     }
 }

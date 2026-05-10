@@ -9,30 +9,34 @@ namespace HRplatform.Infrastructure.Repositories
     {
         private readonly MySqlConnectionFactory _factory;
 
+        // dependency injection
         public CandidateRepository(MySqlConnectionFactory factory)
         {
             _factory = factory;
         }
+
+        // adds new candidate to the database and returns the id of the created candidate
         public async Task<string> CreateCandidateAsync(Domain.Candidate candidate)
         {
             string sql = "INSERT INTO Candidate (id,full_name, date_of_birth, email, contact_num) VALUES (@id, @fullName, @dateOfBirth, @email, @contactNum);";
-            using (MySqlConnection conn = _factory.Create())
+            using (MySqlConnection conn = _factory.Create()) // creates connection to the database
             {
-                await conn.OpenAsync();
-                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                await conn.OpenAsync(); // opens the connection to the database
+                using (MySqlCommand cmd = new MySqlCommand(sql, conn))  // for sql command
                 {
-                    cmd.Parameters.AddWithValue("@id", candidate.Id);
+                    cmd.Parameters.AddWithValue("@id", candidate.Id);  // adds parameters
                     cmd.Parameters.AddWithValue("@fullName", candidate.FullName);
                     cmd.Parameters.AddWithValue("@dateOfBirth", candidate.DateOfBirth);
                     cmd.Parameters.AddWithValue("@email", candidate.Email);
                     cmd.Parameters.AddWithValue("@contactNum", candidate.ContactNum);
 
-                    await cmd.ExecuteNonQueryAsync();
+                    await cmd.ExecuteNonQueryAsync();  // executes the command
                     return candidate.Id;
                 }
             }
         }
 
+        // checks if candidate with the given email exists in the database
         public async Task<bool> CandidateExistsByEmailAsync(string email)
         {
             string sql = "SELECT 1 FROM Candidate WHERE email = @email;";
@@ -43,11 +47,13 @@ namespace HRplatform.Infrastructure.Repositories
                 {
                     cmd.Parameters.AddWithValue("@email", email);
 
-                    object? result = await cmd.ExecuteScalarAsync();
+                    object? result = await cmd.ExecuteScalarAsync(); // returns first column of the first row or null
                     return result != null;
                 }
             }
         }
+
+        // checks if candidate with the given email exists in the database except the itself (for updating)
         public async Task<bool> CandidateExistsByEmailExceptThisIdAsync(string email, string id)
         {
             string sql = "SELECT 1 FROM Candidate WHERE email = @email AND id != @id;";
@@ -64,6 +70,8 @@ namespace HRplatform.Infrastructure.Repositories
                 }
             }
         }
+
+        // checks if candidate with the given id exists in the database
         public async Task<bool> CandidateExistsByIdAsync(string id)
         {
             string sql = "SELECT 1 FROM Candidate WHERE id = @id;";
@@ -80,6 +88,7 @@ namespace HRplatform.Infrastructure.Repositories
             }
         }
 
+        // checks if candidate has the skill with the given skill id
         public async Task<bool> CandidateHasSkillAsync(string candidateId, string skillId)
         {
             string sql = "SELECT 1 FROM candidate_skills WHERE candidate_id = @candidate_id AND skill_id = @skill_id;";
@@ -95,7 +104,8 @@ namespace HRplatform.Infrastructure.Repositories
                 }
             }
         }
-
+        
+        // adds a skill to a candidate
         public async Task<bool> AddSkillToCandidateAsync(string candidateId, string skillId)
         {
             string sql = "INSERT INTO candidate_skills (candidate_id, skill_id) VALUES (@candidate_id, @skill_id);";
@@ -113,6 +123,7 @@ namespace HRplatform.Infrastructure.Repositories
             }
         }
 
+        // removes a skill from a candidate
         public async Task<bool> RemoveSkillFromCandidateAsync(string candidateId, string skillId)
         {
             string sql = "DELETE FROM candidate_skills WHERE candidate_id = @candidate_id AND skill_id = @skill_id;";
@@ -132,6 +143,7 @@ namespace HRplatform.Infrastructure.Repositories
             }
         }
 
+        // all skills of a candidate with the given candidate id
         private async Task<List<Skill>> GetSkillsForCandidateAsync(MySqlConnection conn, string candidateId)
         {
             string sql = "SELECT s.id, s.name FROM candidate_skills cs INNER JOIN skill s ON s.id = cs.skill_id WHERE cs.candidate_id = @candidate_id;";
@@ -155,6 +167,8 @@ namespace HRplatform.Infrastructure.Repositories
 
             return skills;
         }
+
+        // gets all candidates with their skills
         public async Task<List<Candidate>> GetAllCandidatesWithSkillsAsync()
         {
             string sql = "SELECT id, full_name, date_of_birth, email, contact_num FROM Candidate;";
@@ -190,6 +204,7 @@ namespace HRplatform.Infrastructure.Repositories
             return candidates;
         }
 
+        // gets a candidate with the given id with skills
         public async Task<Candidate?> GetCandidateWithSkillsByIdAsync(string id)
         {
             string sql = "SELECT * FROM Candidate WHERE id = @id;";
@@ -224,8 +239,12 @@ namespace HRplatform.Infrastructure.Repositories
             }
         }
 
+        // gets candidates with the given name with skills
         public async Task<List<Candidate>> GetCandidatesWithSkillsByNameAsync(string name)
         {
+            // personally, when i search in real life, i rarely use correct capitalization (same for name of skills, C is same like c for me)
+            // database supports case insensitive 
+
             string sql = "SELECT * FROM Candidate WHERE full_name = @name;";
             List<Candidate> candidates = new List<Candidate>(); 
             using (MySqlConnection conn = _factory.Create())
@@ -259,6 +278,7 @@ namespace HRplatform.Infrastructure.Repositories
             }
         }
 
+        // deletes a candidate with the given id from the database
         public async Task<bool> DeleteCandidateAsync(string id)
         {
             string sql = "DELETE FROM Candidate WHERE id = @id;";
@@ -275,6 +295,7 @@ namespace HRplatform.Infrastructure.Repositories
             }
         }
 
+        // updates a candidate
         public async Task<bool> UpdateCandidateAsync(Candidate candidate)
         {
             string sql = "UPDATE Candidate SET full_name = @full_name, date_of_birth = @date_of_birth, email = @email, contact_num = @contact_num WHERE id = @id;";
@@ -295,10 +316,13 @@ namespace HRplatform.Infrastructure.Repositories
             }
         }
 
+        // searches candidates by name and skills
+        // if name is empty searches only by skills, if skills is empty searches only by name
+        // in service layer, both name and skills can`t be empty
         public async Task<List<Candidate>> GetCandidatesBySkillsAndNameAsync(string? name, List<string>? skillsId)
         {
             string nameValue="";
-            bool hasName = false;
+            bool hasName = false; 
             bool hasSkills = false;
             if (!string.IsNullOrWhiteSpace(name))
             {
@@ -321,31 +345,30 @@ namespace HRplatform.Infrastructure.Repositories
             }
 
             if (!hasName && !hasSkills)
-                return new List<Candidate>();
+                return new List<Candidate>(); // in service layer, we will write error message
 
-            string sql = "SELECT c.id, c.full_name, c.date_of_birth, c.email, c.contact_num " + "FROM Candidate c ";
+            string sql = "SELECT DISTINCT c.id, c.full_name, c.date_of_birth, c.email, c.contact_num FROM Candidate c ";
 
-            if (hasSkills)
+            if (hasSkills) // if we have skills, we are joining tables
                 sql += "INNER JOIN candidate_skills cs ON cs.candidate_id = c.id ";
 
-            sql += "WHERE 1=1 ";
+            sql += "WHERE 1=1 "; // if we have name or skills, we will add conditions, if not, this condition will be always true
 
-            if (hasName)
+            if (hasName) // if we have name, we are adding condition for name
                 sql += "AND c.full_name LIKE @name ";
 
             if (hasSkills)
             {
-                string inList = "";
+                List<string> parameters = new List<string>();
+
                 for (int i = 0; i < ids.Count; i++)
                 {
-                    if (i > 0)
-                        inList += ", ";
-
-                    inList += "@s" + i;
+                    parameters.Add("@s" + i); // we are adding parameters for skills
                 }
-                sql += $"AND cs.skill_id IN ({inList}) \n";
-                sql += "GROUP BY c.id \n";
-                sql += "HAVING COUNT(DISTINCT cs.skill_id) = @skillCount \n"; 
+
+                string inList = string.Join(", ", parameters);
+
+                sql += $"AND cs.skill_id IN ({inList}) \n"; // any skill can match
             }
 
             List<Candidate> candidates = new List<Candidate>();
@@ -363,8 +386,6 @@ namespace HRplatform.Infrastructure.Repositories
                     {
                         for (int i = 0; i < ids.Count; i++)
                             cmd.Parameters.AddWithValue("@s" + i, ids[i]);
-
-                        cmd.Parameters.AddWithValue("@skillCount", ids.Count);
                     }
 
                     using (MySqlDataReader reader = await cmd.ExecuteReaderAsync())

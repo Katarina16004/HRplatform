@@ -9,27 +9,31 @@ namespace HRplatform.Infrastructure.Repositories
     {
         private readonly MySqlConnectionFactory _factory;
 
+        // dependency injection
         public SkillRepository(MySqlConnectionFactory factory)
         {
             _factory = factory;
         }
+
+        // adds new skill to the database and returns the id of the created skill
         public async Task<string> CreateSkillAsync(Domain.Skill skill)
         {
             string sql = "INSERT INTO Skill (id, name) VALUES (@id, @name);";
-            using (MySqlConnection conn = _factory.Create())
+            using (MySqlConnection conn = _factory.Create()) // creates connection to the database
             {
-                await conn.OpenAsync();
-                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                await conn.OpenAsync(); // opens the connection to the database
+                using (MySqlCommand cmd = new MySqlCommand(sql, conn)) // for sql command
                 {
-                    cmd.Parameters.AddWithValue("@id", skill.Id);
+                    cmd.Parameters.AddWithValue("@id", skill.Id);  // adds parameters
                     cmd.Parameters.AddWithValue("@name", skill.Name);
 
-                    await cmd.ExecuteNonQueryAsync();
+                    await cmd.ExecuteNonQueryAsync(); // executes the command
                     return skill.Id;
                 }
             }
         }
 
+        // gets skill with the given name
         public async Task<bool> SkillExistsByNameAsync(string name)
         {
             string sql = "SELECT 1 FROM Skill WHERE name = @name;";
@@ -40,12 +44,13 @@ namespace HRplatform.Infrastructure.Repositories
                 {
                     cmd.Parameters.AddWithValue("@name", name);
 
-                    object? result = await cmd.ExecuteScalarAsync();
+                    object? result = await cmd.ExecuteScalarAsync(); // returns first column of the first row or null
                     return result != null;
                 }
             }
         }
 
+        // gets all skills from database
         public async Task<List<Skill>> GetAllSkillsAsync()
         {
             string sql = "SELECT * FROM Skill;";
@@ -71,6 +76,7 @@ namespace HRplatform.Infrastructure.Repositories
             }
         }
 
+        // gets a skill with the given id
         public async Task<Skill?> GetSkillByIdAsync(string id)
         {
             string sql = "SELECT * FROM Skill WHERE id = @id;";
@@ -95,8 +101,12 @@ namespace HRplatform.Infrastructure.Repositories
             return null;
         }
 
+        // gets a skill with the given name 
         public async Task<Skill?> GetSkillByNameAsync(string name)
         {
+            // personally, when i search in real life, i rarely use correct capitalization (same for name of candidate)
+            // database supports case insensitive 
+
             string sql = "SELECT * FROM Skill WHERE name = @name;";
             using (MySqlConnection conn = _factory.Create())
             {
@@ -119,6 +129,7 @@ namespace HRplatform.Infrastructure.Repositories
             return null;
         }
 
+        // deletes a skill with the given id from the database
         public async Task<bool> DeleteSkillAsync(string id)
         {
             string sql = "DELETE FROM Skill WHERE id = @id;";

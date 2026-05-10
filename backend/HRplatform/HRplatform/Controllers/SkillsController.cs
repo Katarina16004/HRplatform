@@ -15,6 +15,7 @@ namespace HRplatform.API.Controllers
             _service = service;
         }
 
+        // creates skill
         [HttpPost]
         public async Task<IActionResult> Create(CreateSkillRequest request)
         {
@@ -28,6 +29,8 @@ namespace HRplatform.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        // gets all skills
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -41,6 +44,8 @@ namespace HRplatform.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        // gets skill by id
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
         {
@@ -54,6 +59,8 @@ namespace HRplatform.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        //get skill by name (name is unique) (c = C)
         [HttpGet("byName/{name}")]
         public async Task<IActionResult> GetByName(string name)
         {
@@ -67,6 +74,8 @@ namespace HRplatform.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        // deletes skill 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
