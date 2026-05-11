@@ -27,7 +27,8 @@ export const skillApi: ISkillAPIService = {
 
     async getSkillByName(name: string): Promise<Skill | null> {
         try {
-            const res = await axios.get<Skill>(`${API_URL}/byName/${name}`);
+            const encodedName = encodeURIComponent(name); //special characters
+            const res = await axios.get<Skill>(`${API_URL}/byName/${encodedName}`);
             return res.data;
         } catch (error) {
             console.error(`Error fetching skill by name ${name}:`, error);
@@ -37,7 +38,7 @@ export const skillApi: ISkillAPIService = {
     
     async createSkill(skill: CreateSkillRequest): Promise<string> {
         try {
-            const res = await axios.post<{ id: string }>(API_URL, { skill });
+            const res = await axios.post<{ id: string }>(API_URL, skill);
             return res.data.id;
         } catch (error) {
             console.error("Error creating skill:", error);
