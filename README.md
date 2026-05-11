@@ -47,3 +47,35 @@ The HR Platform is built with a tech stack:
 8. Do npm install in HRplatform-frontend folder
 9. Do npm run dev (start backend first!)
 10. Test application
+
+
+## Implementation Highlights
+
+### Most Challenging Part: Clean Architecture & SOLID Principles + Unit Testing
+#### Why it was challenging:
+
+1. **Clean Architecture Implementation**
+   - Separating concerns across Repository, Service, and Controller layers
+   - Ensuring each layer has a single responsibility
+   - Making sure data flows correctly through all layers
+
+2. **SOLID Principles**
+   - Designing interfaces for repositories to follow Interface Segregation
+   - Using Dependency Injection for loose coupling
+
+3. **Unit Testing**
+   - Tests were harder than the actual implementation for me
+   - I don't write tests that often
+   - A lot of situation needs to be tested
+
+#### Key Decisions:
+
+- **Repository Pattern**: Created separate repository classes for each entity (SkillRepository, CandidateRepository) to abstract data access logic
+- **Service Layer**: Business logic lives in services (SkillService, CandidateService), not in controllers
+- **NUnit Tests**: Wrote tests for critical business logic
+
+#### Why this approach matters:
+- **Maintainability**: Clear separation makes it easy to find and fix bugs
+- **Testability**: Each component can be tested independently with mocks
+- **Scalability**: Adding new features doesn't require rewriting existing code
+- **Professional Standard**: This architecture is used in real-world applications
