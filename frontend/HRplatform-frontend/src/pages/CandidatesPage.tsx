@@ -142,7 +142,10 @@ const CandidatesPage = () => {
                 <CandidateTable 
                     candidates={candidates} 
                     onDelete={handleDelete} 
-                    onEdit={(c) => setEditingCandidate(c)}
+                    onEdit={(c) => { 
+                        setEditingCandidate(c); 
+                        window.scrollTo({ top: 0, behavior: 'smooth' }); 
+                    }}
                     onAddSkill={handleAddSkill}
                     onRemoveSkill={handleRemoveSkill}
                 />
