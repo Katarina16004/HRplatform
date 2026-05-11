@@ -85,12 +85,12 @@ export const candidateApi: ICandidateAPIService = {
         }
     },
 
-    async searchCandidates(name?: string, skillIds?: string): Promise<Candidate[]> {
+    async searchCandidates(name?: string, skillName?: string): Promise<Candidate[]> {
         try {
             const res = await axios.get<Candidate[]>(`${API_URL}/search`, {
                 params: { 
                     name: name || undefined, 
-                    skillIds: skillIds || undefined 
+                    skillName: skillName || undefined 
                 }
             });
             return res.data || [];

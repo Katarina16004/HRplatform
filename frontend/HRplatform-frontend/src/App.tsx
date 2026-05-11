@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import SkillsPage from './pages/SkillsPage';
+import CandidatesPage from './pages/CandidatesPage';
 import { Toaster } from 'react-hot-toast';
 
 const App = () => {
@@ -12,15 +13,17 @@ const App = () => {
                     backgroundColor: '#f8f9fa', 
                     borderBottom: '1px solid #ddd',
                     display: 'flex',
-                    gap: '20px' 
+                    gap: '20px',
+                    position: 'fixed',
+                    width: '100%'
                 }}>
                     <Link to="/" style={{ color: '#007bff', fontWeight: 'bold' }}>Candidates</Link>
                     <Link to="/skills" style={{ color: '#007bff', fontWeight: 'bold' }}>Skills</Link>
                 </nav>
 
-                <main style={{padding: '20px' }}>
+                <main style={{marginTop: '80px'}}>
                     <Routes>
-                        <Route path="/" element={<div>CandidatesPage</div>} />
+                        <Route path="/" element={<CandidatesPage />} />
                         <Route path="/skills" element={<SkillsPage />} />
                     </Routes>
                 </main>

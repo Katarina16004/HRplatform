@@ -52,7 +52,7 @@ const SkillsPage = () => {
     };
 
     return (
-        <div style={{ maxWidth: '80%', margin: '40px auto', padding: '20px', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 2px 10px #7998fb3d' }}>
+        <div style={{ maxWidth: '90%', margin: '40px auto', padding: '20px', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 2px 10px #7998fb3d' }}>
             <h1 style={{ paddingBottom: '10px' }}>Skills</h1>
             
             <div style={{ 

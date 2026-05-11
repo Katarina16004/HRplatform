@@ -45,24 +45,24 @@ const SkillSearch = () => {
                 value={search} 
                 onChange={(e) => setSearch(e.target.value)} 
                 placeholder="Enter skill ID or name" 
-                style={{ padding: '4px', width: '250px', borderRadius: '4px', border: '1px solid #ccc'  }}
+                style={{ padding: '6px', width: '300px', borderRadius: '4px', border: '1px solid #ccc' }}
             />
             <div style={{ marginTop: '10px' }}/>
             <button onClick={handleSearchById} style={{
-                            padding: '4px 8px',
+                            padding: '6px 12px',
                             cursor: 'pointer',
                             fontSize: '15px',
-                            border: '1px solid white',
+                            border: 'none',
                             borderRadius: '4px',
                             background: '#007bff',
                             color: 'white',
                             marginRight: '10px'
                         }}>Search by ID</button>
             <button onClick={handleSearchByName} style={{
-                            padding: '4px 8px',
+                            padding: '6px 12px',
                             cursor: 'pointer',
                             fontSize: '15px',
-                            border: '1px solid white',
+                            border: 'none',
                             borderRadius: '4px',
                             background: '#007bff',
                             color: 'white',

@@ -9,7 +9,7 @@ export interface Candidate {
 }
 export interface CreateUpdateCandidateRequest {
     fullName: string;
-    dateOfBirth: string | null;
+    dateOfBirth: string;
     email: string;
     contactNum: string;
 }
