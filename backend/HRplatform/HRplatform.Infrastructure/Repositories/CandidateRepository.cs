@@ -319,7 +319,7 @@ namespace HRplatform.Infrastructure.Repositories
         // searches candidates by name and skills
         // if name is empty searches only by skills, if skills is empty searches only by name
         // in service layer, both name and skills can`t be empty
-        public async Task<List<Candidate>> GetCandidatesBySkillsAndNameAsync(string? name, List<string>? skillsId)
+        public async Task<List<Candidate>> GetCandidatesBySkillsAndNameAsync(string? name, List<string>? skillName)
         {
             string nameValue="";
             bool hasName = false; 
@@ -332,11 +332,11 @@ namespace HRplatform.Infrastructure.Repositories
 
             List<string> ids = new List<string>();
 
-            if (skillsId != null)
+            if (skillName != null)
             {
-                foreach (var skillId in skillsId)
+                foreach (var skill in skillName)
                 { 
-                    string? v = skillId;
+                    string? v = skill;
                     if (string.IsNullOrWhiteSpace(v))
                         continue;
                     ids.Add(v.Trim());
@@ -350,7 +350,10 @@ namespace HRplatform.Infrastructure.Repositories
             string sql = "SELECT DISTINCT c.id, c.full_name, c.date_of_birth, c.email, c.contact_num FROM Candidate c ";
 
             if (hasSkills) // if we have skills, we are joining tables
+            {
                 sql += "INNER JOIN candidate_skills cs ON cs.candidate_id = c.id ";
+                sql += "INNER JOIN skill s ON s.id = cs.skill_id ";  // we need for skill name
+            }
 
             sql += "WHERE 1=1 "; // if we have name or skills, we will add conditions, if not, this condition will be always true
 
@@ -368,7 +371,7 @@ namespace HRplatform.Infrastructure.Repositories
 
                 string inList = string.Join(", ", parameters);
 
-                sql += $"AND cs.skill_id IN ({inList}) \n"; // any skill can match
+                sql += $"AND s.name IN ({inList}) \n"; // any skill can match
             }
 
             List<Candidate> candidates = new List<Candidate>();

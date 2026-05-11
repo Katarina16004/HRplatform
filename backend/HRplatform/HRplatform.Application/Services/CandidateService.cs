@@ -168,11 +168,11 @@ namespace HRplatform.Application.Services
             return await _repo.DeleteCandidateAsync(id);
         }
 
-        public async Task<List<Candidate>> GetCandidatesBySkillsAndNameAsync(string? name, List<string>? skillsId)
+        public async Task<List<Candidate>> GetCandidatesBySkillsAndNameAsync(string? name, List<string>? skillName)
         {
-            if (string.IsNullOrWhiteSpace(name) && (skillsId == null || skillsId.Count == 0))
+            if (string.IsNullOrWhiteSpace(name) && (skillName == null || skillName.Count == 0))
                 throw new Exception("At least name or skills are required.");
-            List<Candidate> candidates = await _repo.GetCandidatesBySkillsAndNameAsync(name, skillsId);
+            List<Candidate> candidates = await _repo.GetCandidatesBySkillsAndNameAsync(name, skillName);
             if (candidates == null || candidates.Count == 0)
                 throw new Exception("Candidate not found.");
             return candidates;

@@ -143,24 +143,24 @@ namespace HRplatform.API.Controllers
 
         // searching candidates by name or/and skills (if has any of skills it will be returned)
         [HttpGet("search")]
-        public async Task<IActionResult> Search(string? name, string? skillIds)
+        public async Task<IActionResult> Search(string? name, string? skillName)
         {
             try
             {
-                List<string> ids = new List<string>();
+                List<string> skillsNames = new List<string>();
 
-                if (!string.IsNullOrWhiteSpace(skillIds))
+                if (!string.IsNullOrWhiteSpace(skillName))
                 {
-                    string[] parts = skillIds.Split(',');
+                    string[] parts = skillName.Split(',');
 
                     foreach (var part in parts)
                     {
                         if (!string.IsNullOrWhiteSpace(part))
-                            ids.Add(part.Trim());
+                            skillsNames.Add(part.Trim());
                     }
                 }
 
-                var candidates = await _service.GetCandidatesBySkillsAndNameAsync(name, ids);
+                var candidates = await _service.GetCandidatesBySkillsAndNameAsync(name, skillsNames);
                 return Ok(candidates);
             }
             catch (Exception ex)
