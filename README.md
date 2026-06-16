@@ -51,23 +51,6 @@ The HR Platform is built with a tech stack:
 
 ## Implementation Highlights
 
-### Most Challenging Part: Clean Architecture & SOLID Principles + Unit Testing
-#### Why it was challenging:
-
-1. **Clean Architecture Implementation**
-   - Separating concerns across Repository, Service, and Controller layers
-   - Ensuring each layer has a single responsibility
-   - Making sure data flows correctly through all layers
-
-2. **SOLID Principles**
-   - Designing interfaces for repositories to follow Interface Segregation
-   - Using Dependency Injection for loose coupling
-
-3. **Unit Testing**
-   - Tests were harder than the actual implementation for me
-   - I don't write tests that often
-   - A lot of situation needs to be tested
-
 #### Key Decisions:
 
 - **Repository Pattern**: Created separate repository classes for each entity (SkillRepository, CandidateRepository) to abstract data access logic
